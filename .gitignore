@@ -1,0 +1,7 @@
+*.log
+testResults.xml
+coverage.xml
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini
