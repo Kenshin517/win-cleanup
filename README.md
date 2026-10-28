@@ -1,6 +1,6 @@
 # win-cleanup
 
-[![CI](https://github.com/OWNER/win-cleanup/actions/workflows/ci.yml/badge.svg)](https://github.com/OWNER/win-cleanup/actions/workflows/ci.yml)
+[![CI](https://github.com/Kenshin517/win-cleanup/actions/workflows/ci.yml/badge.svg)](https://github.com/Kenshin517/win-cleanup/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 One script to free space on a full Windows `C:` drive, **safely**.
@@ -41,23 +41,96 @@ the parts that need a human decision.
 **What it deliberately never does:** delete your personal files, uninstall apps, clear the `Prefetch`
 folder (that makes apps start *slower*), or touch Windows rollback data.
 
-## Quick start
+## Requirements
 
-1. Download this repo: **Code → Download ZIP**, then extract it (or `git clone`).
-2. Double-click **`run-cleanup.cmd`** and accept the Administrator prompt.
+- Windows 10 or 11
+- Windows PowerShell 5.1 (already built into Windows) or PowerShell 7+
+- Administrator rights for the system-level tasks
+- [Git](https://git-scm.com/download/win) *only* if you want to install with `git clone`
 
-### Recommended: dry run first
+## Installation
 
-Open PowerShell **as Administrator** in the extracted folder:
+Pick **one** of the two options.
+
+### Option A: git clone
+
+1. Open **PowerShell** (no admin needed for this step).
+2. Go to the folder where you want to keep the tool, e.g. your user folder:
+
+   ```powershell
+   cd $HOME
+   ```
+
+3. Clone the repository:
+
+   ```powershell
+   git clone https://github.com/Kenshin517/win-cleanup.git
+   ```
+
+4. Enter the folder:
+
+   ```powershell
+   cd win-cleanup
+   ```
+
+To update later, run `git pull` inside the `win-cleanup` folder.
+
+### Option B: download ZIP (no Git needed)
+
+1. On this page, click the green **Code** button, then **Download ZIP**.
+2. Right-click the downloaded `win-cleanup-main.zip`, choose **Properties**, tick **Unblock**, click **OK**.
+   (This stops Windows from blocking scripts downloaded from the internet.)
+3. Right-click the ZIP again, choose **Extract All...**, and extract it, e.g. to `C:\win-cleanup`.
+
+## Usage
+
+### Easiest: double-click
+
+1. Open the `win-cleanup` folder in File Explorer.
+2. Double-click **`run-cleanup.cmd`**.
+3. Click **Yes** on the Administrator (UAC) prompt.
+4. Automatic tasks run first. For each "ask first" task, type **Y** to clean it or **N** to keep it, then press Enter.
+5. Read the summary and the list of your largest files/apps, then press any key to close.
+
+> [!TIP]
+> If Windows shows **"Windows protected your PC"**, click **More info → Run anyway**.
+
+### Recommended: dry run first (PowerShell)
+
+A dry run shows what *would* be deleted and how much space you'd get, without deleting anything.
+
+1. Press **Start**, type `PowerShell`, right-click **Windows PowerShell**, choose **Run as administrator**.
+2. Go to the folder (adjust the path to where you put it):
+
+   ```powershell
+   cd $HOME\win-cleanup
+   ```
+
+3. Run the dry run:
+
+   ```powershell
+   powershell -ExecutionPolicy Bypass -File .\cleanup.ps1 -WhatIf
+   ```
+
+4. If you're happy with the result, run it for real:
+
+   ```powershell
+   powershell -ExecutionPolicy Bypass -File .\cleanup.ps1
+   ```
+
+`-ExecutionPolicy Bypass` only applies to this one command; it does not change your system settings.
+
+### More examples
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\cleanup.ps1 -WhatIf
-```
+# Never touch the hibernation file or restore points
+powershell -ExecutionPolicy Bypass -File .\cleanup.ps1 -Skip hibernation, restore-points
 
-When you're happy with what it shows, run it for real:
+# Also run the slow DISM component store cleanup
+powershell -ExecutionPolicy Bypass -File .\cleanup.ps1 -Deep
 
-```powershell
-powershell -ExecutionPolicy Bypass -File .\cleanup.ps1
+# Delete all temp files, not only ones older than 24 hours
+powershell -ExecutionPolicy Bypass -File .\cleanup.ps1 -TempMinAgeHours 0
 ```
 
 ### Options
@@ -154,5 +227,32 @@ digabung jadi satu:
 - **Tanya dulu**: Recycle Bin, restore point lama (yang terbaru tetap disimpan), file hibernasi.
 - **Laporan saja**: file terbesar di folder pribadi dan aplikasi terbesar. Tidak ada yang dihapus.
 
-**Cara pakai:** download ZIP, ekstrak, lalu klik dua kali `run-cleanup.cmd`.
-Untuk simulasi tanpa menghapus apa pun, jalankan `.\cleanup.ps1 -WhatIf` di PowerShell (Administrator).
+### Instalasi
+
+**Opsi A, pakai git clone** (butuh [Git](https://git-scm.com/download/win)):
+
+```powershell
+cd $HOME
+git clone https://github.com/Kenshin517/win-cleanup.git
+cd win-cleanup
+```
+
+Untuk update ke versi terbaru: `git pull` di dalam folder `win-cleanup`.
+
+**Opsi B, download ZIP:** klik tombol hijau **Code → Download ZIP**, klik kanan file ZIP →
+**Properties** → centang **Unblock** → OK, lalu klik kanan → **Extract All...**
+
+### Cara pakai
+
+**Paling gampang:** buka folder `win-cleanup`, klik dua kali `run-cleanup.cmd`, klik **Yes** di prompt
+Administrator. Untuk task "tanya dulu", ketik **Y** (bersihkan) atau **N** (lewati) lalu Enter.
+Kalau muncul "Windows protected your PC", klik **More info → Run anyway**.
+
+**Disarankan, simulasi dulu:** buka PowerShell sebagai Administrator (Start → ketik `PowerShell` →
+klik kanan → **Run as administrator**), lalu:
+
+```powershell
+cd $HOME\win-cleanup
+powershell -ExecutionPolicy Bypass -File .\cleanup.ps1 -WhatIf   # simulasi, tidak menghapus apa pun
+powershell -ExecutionPolicy Bypass -File .\cleanup.ps1           # jalankan beneran
+```
